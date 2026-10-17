@@ -85,7 +85,7 @@ export default function AdminDashboard({ onNavigate }) {
                 <Database className="w-3.5 h-3.5 text-emerald-400" />
                 SQLite Active: pharma.db
               </span>
-              <span className="text-xs text-slate-400 font-medium hidden sm:inline">• Sigma Medex Wholesale Desk</span>
+              <span className="text-xs text-slate-400 font-medium hidden sm:inline">• Vital Medex Wholesale Desk</span>
             </div>
 
             <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
@@ -643,7 +643,7 @@ export default function AdminDashboard({ onNavigate }) {
                       <td className="py-4 px-5 text-right">
                         <button
                           onClick={() => {
-                            const text = encodeURIComponent(`Hello ${inq.buyerName}, Regarding your inquiry for ${inq.productName} (${inq.quantity}) at Sigma Medex...`);
+                            const text = encodeURIComponent(`Hello ${inq.buyerName}, Regarding your inquiry for ${inq.productName} (${inq.quantity}) at Vital Medex...`);
                             window.open(`https://wa.me/${inq.phone?.replace(/[^0-9]/g, '')}?text=${text}`, '_blank');
                           }}
                           className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-[11px] rounded-xl shadow-md flex items-center gap-1.5 ml-auto transition"

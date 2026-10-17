@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const CartContext = createContext();
 
 const INITIAL_INQUIRIES = [
   {
     id: 'inq-101',
-    productName: 'Semalix Semaglutide 3mg Tablets',
+    productName: 'A RET TRETIGEL 0.1% 20 MG GEL',
     buyerName: 'Dr. Vivek Mehra',
     email: 'vivek@delhiclinic.com',
     phone: '+91 9811223344',
@@ -18,7 +18,7 @@ const INITIAL_INQUIRIES = [
   },
   {
     id: 'inq-102',
-    productName: 'Eravone Edaravone Injection',
+    productName: 'Semaglutide Tablets',
     buyerName: 'Metro Hospital Procurement',
     email: 'procure@metrohospitals.in',
     phone: '+91 9922334455',
@@ -45,8 +45,7 @@ const INITIAL_ORDERS = [
     paymentStatus: 'Paid',
     orderStatus: 'Dispatched',
     items: [
-      { id: 'med-1', name: 'Dutaheal 0.5mg Tablets', quantity: 6, price: 420 },
-      { id: 'med-8', name: 'Hydrobact Hydroquinone 4% Cream', quantity: 4, price: 320 }
+      { id: 'med-1', name: 'Zopiclone Tablet 10mg', quantity: 6, price: 420 }
     ],
     hasPrescription: true,
     prescriptionFile: 'Dr_Prescription_Sharma.pdf'
@@ -64,7 +63,7 @@ const INITIAL_ORDERS = [
     paymentStatus: 'Pending (COD)',
     orderStatus: 'Confirmed',
     items: [
-      { id: 'med-2', name: 'AccuRet 20mg Capsules', quantity: 1, price: 480 }
+      { id: 'med-2', name: 'Pregabalin 150mg', quantity: 1, price: 480 }
     ],
     hasPrescription: false,
     prescriptionFile: null

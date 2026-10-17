@@ -114,7 +114,7 @@ export default function CheckoutModal() {
                   Invoice #{orderComplete.id}
                 </h2>
                 <p className="text-xs text-slate-500 mt-1">
-                  Thank you! Your medicine order has been logged into Sigma Medex dispatch warehouse.
+                  Thank you! Your medicine order has been logged into Vital Medex dispatch warehouse.
                 </p>
               </div>
 

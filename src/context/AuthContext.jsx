@@ -5,12 +5,12 @@ const AuthContext = createContext();
 const DEFAULT_USERS = [
   {
     id: 'user-admin',
-    name: 'Manoj (Sigma Medex)',
-    email: 'admin@sigmamedex.com',
+    name: 'Manoj (Vital Medex)',
+    email: 'admin@vitalmedex.com',
     password: 'admin123',
     role: 'admin',
     phone: '+91 8047302413',
-    company: 'Sigma Medex Wholesale',
+    company: 'Vital Medex Wholesale',
     gstin: '27AEPFS7579K1ZW',
   },
   {

@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import db from './db.js';
 
 const app = express();
@@ -61,10 +63,10 @@ app.post('/api/products', (req, res) => {
       reviewsCount: 1,
       isFeatured: p.isFeatured ? 1 : 0,
       isBestSeller: 0,
-      image: p.image || 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=600&auto=format&fit=crop&q=80',
+      image: p.image || '',
       description: p.description || '',
       composition: p.composition || '',
-      storage: p.storage || 'Store below 25°C.',
+      storage: p.storage || 'Store below 25Â°C.',
       dosage: p.dosage || 'As directed by Physician.',
     };
 
@@ -350,7 +352,107 @@ app.post('/api/auth/register', (req, res) => {
   }
 });
 
+// --- 6. ALL TIME MEDEX ENQUIRIES API (with Google Sheets sync) ---
+const CONFIG_FILE = fileURLToPath(new URL('./googleSheetConfig.json', import.meta.url));
+
+function getGoogleSheetConfig() {
+  try {
+    if (fs.existsSync(CONFIG_FILE)) {
+      return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'));
+    }
+  } catch (e) {
+    console.error('Config read error:', e.message);
+  }
+  return { recipientEmail: 'salesvitalmedex@gmail.com', webhookUrl: '', sheetName: 'All Time Medex Enquiries' };
+}
+
+// POST new Enquiry (saves to SQLite & forwards to Google Sheets)
+app.post('/api/enquiries', async (req, res) => {
+  try {
+    const { name, contact, email, country, enquiryFor } = req.body;
+
+    if (!name || !contact || !email) {
+      return res.status(400).json({ error: 'Name, Contact and Email are required.' });
+    }
+
+    const id = 'ENQ-' + Date.now();
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    const timeStr = now.toLocaleTimeString('en-IN', { hour12: true });
+
+    let synced = 0;
+    const config = getGoogleSheetConfig();
+
+    // Forward to Google Sheets Webhook if provided
+    // NOTE: Google Apps Script Web App redirects POST → use GET with query params (most reliable method)
+    if (config.webhookUrl) {
+      try {
+        const payload = {
+          id,
+          date: dateStr,
+          time: timeStr,
+          timestamp: `${dateStr} ${timeStr}`,
+          name: name.trim(),
+          contact: contact.trim(),
+          email: email.trim(),
+          country: (country || 'India').trim(),
+          enquiryFor: (enquiryFor || 'General Medicine Enquiry').trim(),
+          recipientEmail: 'salesvitalmedex@gmail.com',
+          secretToken: 'ATMSecure2026' // Secure token for Apps Script authentication
+        };
+
+        // Google Apps Script redirects POST requests (302), losing the body.
+        // Sending as GET with query params is the standard reliable workaround.
+        const params = new URLSearchParams(payload);
+        const gasUrl = `${config.webhookUrl}?${params.toString()}`;
+
+        const gRes = await fetch(gasUrl, {
+          method: 'GET',
+          redirect: 'follow'
+        });
+
+        if (gRes.ok) {
+          synced = 1;
+          console.log('[Google Sheets] ✅ Data synced successfully for:', payload.name);
+        } else {
+          console.warn('[Google Sheets] ⚠️ Sync responded with status:', gRes.status);
+        }
+      } catch (sheetErr) {
+        console.warn('[Google Sheets Sync Error]:', sheetErr.message);
+      }
+    }
+
+    // The user requested to save ONLY in the Google Sheet and NOT in the website's local database.
+    // We construct the record for the response and logging, but we do not insert it into SQLite.
+    
+    const record = {
+      id,
+      name: name.trim(),
+      contact: contact.trim(),
+      email: email.trim(),
+      country: (country || 'India').trim(),
+      enquiryFor: (enquiryFor || 'General Medicine Enquiry').trim(),
+      recipientEmail: 'salesvitalmedex@gmail.com',
+      date: dateStr,
+      timestamp: `${dateStr} ${timeStr}`,
+      syncedToGoogleSheet: synced
+    };
+
+    console.log(`[All Time Medex Enquiry Logged]:`, record);
+
+    res.status(201).json({
+      success: true,
+      message: 'Enquiry received and recorded for salesvitalmedex@gmail.com',
+      data: record,
+      googleSheetSynced: Boolean(synced)
+    });
+  } catch (err) {
+    console.error('Enquiry error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 app.listen(PORT, () => {
-  console.log(`[SQLite Pharma Server] running at http://localhost:${PORT}`);
+  console.log(`[All Time Medex Server] running at http://localhost:${PORT}`);
   console.log(`[Database] connected to SQLite at pharma.db`);
 });

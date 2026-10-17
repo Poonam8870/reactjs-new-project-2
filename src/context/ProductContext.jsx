@@ -1,13 +1,21 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
-import { INITIAL_PRODUCTS } from '../data/initialProducts';
+import { INITIAL_PRODUCTS, mergeImageCatalog } from '../data/initialProducts';
 
 const ProductContext = createContext();
+const legacyProductNames = new Set(['Fempro Letrozole 2.5mg Tablets', 'Hydrobact Hydroquinone 4% Cream']);
+const legacyProductIds = new Set(['med-7', 'med-8']);
+
+const sanitizeProducts = (products) => {
+  if (!Array.isArray(products)) return [];
+  return products.filter(product => !legacyProductIds.has(product.id) && !legacyProductNames.has(product.name));
+};
 
 export function ProductProvider({ children }) {
   const [products, setProducts] = useState(() => {
     try {
       const saved = localStorage.getItem('sigmamedex_products');
-      return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+      const parsed = saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+      return sanitizeProducts(mergeImageCatalog(parsed));
     } catch (e) {
       return INITIAL_PRODUCTS;
     }
@@ -24,7 +32,7 @@ export function ProductProvider({ children }) {
       .then(res => res.ok ? res.json() : null)
       .then(data => {
         if (data && Array.isArray(data) && data.length > 0) {
-          setProducts(data);
+          setProducts(mergeImageCatalog(sanitizeProducts(data)));
         }
       })
       .catch(() => {});
@@ -45,7 +53,7 @@ export function ProductProvider({ children }) {
       wholesalePrice: Number(newProduct.wholesalePrice) || Math.round(Number(newProduct.price) * 0.7),
       moq: Number(newProduct.moq) || 1,
       packSize: newProduct.packSize || 'Box / Strip',
-      manufacturer: newProduct.manufacturer || 'Sigma Medex Partner',
+      manufacturer: newProduct.manufacturer || 'Vital Medex Partner',
       prescriptionRequired: Boolean(newProduct.prescriptionRequired),
       stock: Number(newProduct.stock) || 100,
       rating: 4.8,
@@ -101,7 +109,8 @@ export function ProductProvider({ children }) {
   };
 
   const resetToDefaults = () => {
-    setProducts(INITIAL_PRODUCTS);
+    const safeDefaults = sanitizeProducts(INITIAL_PRODUCTS);
+    setProducts(safeDefaults);
     localStorage.removeItem('sigmamedex_products');
   };
 

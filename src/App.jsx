@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { AuthProvider } from './context/AuthContext';
 import { ProductProvider } from './context/ProductContext';
 import { CartProvider, useCart } from './context/CartContext';
 
@@ -8,30 +7,29 @@ import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import WhatsAppButton from './components/common/WhatsAppButton';
 
-// Auth modals
-import LoginModal from './components/auth/LoginModal';
-import RegisterModal from './components/auth/RegisterModal';
-
 // Storefront components
 import HeroBanner from './components/store/HeroBanner';
-import CategoryGrid from './components/store/CategoryGrid';
 import ProductCatalog from './components/store/ProductCatalog';
+import AboutStore from './components/store/AboutStore';
+import FeaturedProductsSection from './components/store/FeaturedProductsSection';
+import EnquiryModal from './components/store/EnquiryModal';
 import ProductDetailModal from './components/store/ProductDetailModal';
-import CartDrawer from './components/store/CartDrawer';
-import CheckoutModal from './components/store/CheckoutModal';
-import MyOrdersModal from './components/store/MyOrdersModal';
-import PrescriptionModal from './components/store/PrescriptionModal';
-import B2BQuoteModal from './components/store/B2BQuoteModal';
-
-// Admin components
-import AdminDashboard from './components/admin/AdminDashboard';
 
 function AppContent() {
-  const [currentView, setCurrentView] = useState('store'); // 'store' | 'admin'
-  const { isOrdersModalOpen, setIsOrdersModalOpen } = useCart();
+  const [isEnquiryModalOpen, setIsEnquiryModalOpen] = useState(false);
+  const [enquiryTargetProduct, setEnquiryTargetProduct] = useState(null);
+  const { setActiveProductModal } = useCart();
+
+  const handleOpenEnquiry = (product = null) => {
+    setEnquiryTargetProduct(product);
+    setIsEnquiryModalOpen(true);
+  };
+
+  const handleOpenProductDetails = (product = null) => {
+    setActiveProductModal(product);
+  };
 
   const handleScrollToCatalog = () => {
-    setCurrentView('store');
     const catalogElement = document.getElementById('product-catalog');
     if (catalogElement) {
       catalogElement.scrollIntoView({ behavior: 'smooth' });
@@ -40,54 +38,68 @@ function AppContent() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-800">
-      {/* Universal Navbar */}
-      <Navbar onNavigate={setCurrentView} currentView={currentView} />
+      {/* Vital Medex Navbar */}
+      <Navbar 
+        onOpenEnquiry={handleOpenEnquiry}
+      />
 
-      {/* Main View Router */}
+      {/* Main Content */}
       <main className="flex-1">
-        {currentView === 'admin' ? (
-          <AdminDashboard onNavigate={setCurrentView} />
-        ) : (
-          <div>
-            <HeroBanner onBrowseClick={handleScrollToCatalog} />
-            <CategoryGrid onSelectCategory={() => handleScrollToCatalog()} />
-            <div id="product-catalog">
-              <ProductCatalog />
-            </div>
-          </div>
-        )}
+        <HeroBanner 
+          onBrowseClick={handleScrollToCatalog}
+          onOpenEnquiry={handleOpenEnquiry}
+        />
+        <div id="product-catalog">
+          <ProductCatalog 
+            onEnquire={handleOpenEnquiry}
+            onViewDetail={handleOpenProductDetails}
+          />
+        </div>
+        <AboutStore />
+        <FeaturedProductsSection 
+          onEnquire={handleOpenEnquiry}
+          onViewDetail={handleOpenProductDetails}
+        />
       </main>
 
-      {/* Modals & Slide-overs */}
-      <ProductDetailModal />
-      <CartDrawer />
-      <CheckoutModal />
-      <MyOrdersModal
-        isOpen={isOrdersModalOpen}
-        onClose={() => setIsOrdersModalOpen(false)}
+      {/* Enquiry Form Modal (Saves to sales@vitalmedex.com & Google Sheet) */}
+      <EnquiryModal
+        isOpen={isEnquiryModalOpen}
+        onClose={() => {
+          setIsEnquiryModalOpen(false);
+          if (enquiryTargetProduct) {
+            setActiveProductModal(enquiryTargetProduct);
+          }
+          setEnquiryTargetProduct(null);
+        }}
+        initialProduct={enquiryTargetProduct}
       />
-      <PrescriptionModal />
-      <B2BQuoteModal />
-      <LoginModal />
-      <RegisterModal />
+
+      <ProductDetailModal
+        onGetBestPrice={(product) => {
+          setActiveProductModal(null);
+          setEnquiryTargetProduct(product);
+          setIsEnquiryModalOpen(true);
+        }}
+      />
 
       {/* Floating 1-Click WhatsApp Quick Desk */}
       <WhatsAppButton />
 
-      {/* Footer */}
-      <Footer onNavigate={setCurrentView} />
+      {/* Clean Footer */}
+      <Footer 
+        onOpenEnquiry={handleOpenEnquiry}
+      />
     </div>
   );
 }
 
 export default function App() {
   return (
-    <AuthProvider>
-      <ProductProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
-      </ProductProvider>
-    </AuthProvider>
+    <ProductProvider>
+      <CartProvider>
+        <AppContent />
+      </CartProvider>
+    </ProductProvider>
   );
 }

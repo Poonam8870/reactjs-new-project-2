@@ -22,7 +22,7 @@ export default function AddProductModal({ isOpen, onClose }) {
     wholesalePrice: '',
     moq: '5',
     packSize: 'Box of 10x10 Tablets',
-    manufacturer: 'Sigma Medex Partner',
+    manufacturer: 'Vital Medex Partner',
     stock: '150',
     prescriptionRequired: true,
     image: PRESET_IMAGES[0].url,

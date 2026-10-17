@@ -4,9 +4,9 @@ import { MessageCircle } from 'lucide-react';
 export default function WhatsAppButton() {
   const handleClick = () => {
     const text = encodeURIComponent(
-      "Hello Sigma Medex Team! I am visiting your pharmaceutical portal and would like to enquire about medicine supply and wholesale rates."
+      "Hello Vital Medex Team! I am visiting your website and would like to enquire about medicine supply and wholesale rates."
     );
-    window.open(`https://wa.me/918047302413?text=${text}`, '_blank');
+    window.open(`https://wa.me/919307994481?text=${text}`, '_blank');
   };
 
   return (

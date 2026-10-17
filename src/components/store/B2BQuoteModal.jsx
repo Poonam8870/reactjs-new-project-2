@@ -41,9 +41,9 @@ export default function B2BQuoteModal() {
 
   const handleWhatsAppForward = () => {
     const text = encodeURIComponent(
-      `Hello Sigma Medex,\n*B2B Wholesale Quotation Request*\n*Product:* ${formData.productName}\n*Buyer:* ${formData.buyerName}\n*City/Country:* ${formData.city}, ${formData.country}\n*Quantity:* ${formData.quantity}\n*Notes:* ${formData.message}`
+      `Hello Vital Medex,\n*B2B Wholesale Quotation Request*\n*Product:* ${formData.productName}\n*Buyer:* ${formData.buyerName}\n*City/Country:* ${formData.city}, ${formData.country}\n*Quantity:* ${formData.quantity}\n*Notes:* ${formData.message}`
     );
-    window.open(`https://wa.me/918047302413?text=${text}`, '_blank');
+    window.open(`https://wa.me/919307994481?text=${text}`, '_blank');
   };
 
   return (
@@ -74,7 +74,7 @@ export default function B2BQuoteModal() {
               <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto" />
               <h4 className="text-lg font-bold text-slate-900">Quotation Inquiry Submitted!</h4>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Your request has been logged into our Sigma Medex Wholesale Desk. Our sales team responds within 2-4 hours.
+                Your request has been logged into our Vital Medex Wholesale Desk. Our sales team responds within 2-4 hours.
               </p>
             </div>
           ) : (

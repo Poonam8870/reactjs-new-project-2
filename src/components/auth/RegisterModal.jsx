@@ -48,7 +48,7 @@ export default function RegisterModal() {
           >
             <X className="w-5 h-5" />
           </button>
-          <h3 className="text-xl font-bold">Create Sigma Medex Account</h3>
+          <h3 className="text-xl font-bold">Create Vital Medex Account</h3>
           <p className="text-xs text-teal-100/80 mt-1">
             Join thousands of pharmacies, clinics, and individual buyers
           </p>

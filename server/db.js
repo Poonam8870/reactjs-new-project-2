@@ -17,6 +17,24 @@ const db = new Database(dbPath);
 // Enable WAL mode for high performance
 db.pragma('journal_mode = WAL');
 
+const removeLegacyRemovedProducts = () => {
+  const legacyIds = ['med-7', 'med-8'];
+  db.prepare('DELETE FROM products WHERE id IN (@id1, @id2)').run({ id1: legacyIds[0], id2: legacyIds[1] });
+
+  const orders = db.prepare('SELECT * FROM orders').all();
+  for (const order of orders) {
+    try {
+      const items = JSON.parse(order.items || '[]');
+      const filtered = items.filter(item => !legacyIds.includes(item.id) && !['Fempro Letrozole 2.5mg Tablets', 'Hydrobact Hydroquinone 4% Cream'].includes(item.name));
+      if (filtered.length !== items.length) {
+        db.prepare('UPDATE orders SET items = ? WHERE id = ?').run(JSON.stringify(filtered), order.id);
+      }
+    } catch {
+      // Ignore malformed order payloads.
+    }
+  }
+};
+
 // 1. Create Tables
 db.exec(`
   CREATE TABLE IF NOT EXISTS products (
@@ -74,6 +92,19 @@ db.exec(`
     status TEXT DEFAULT 'New'
   );
 
+  CREATE TABLE IF NOT EXISTS enquiries (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    contact TEXT NOT NULL,
+    email TEXT NOT NULL,
+    country TEXT NOT NULL,
+    enquiryFor TEXT NOT NULL,
+    recipientEmail TEXT DEFAULT 'salesvitalmedex@gmail.com',
+    date TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    syncedToGoogleSheet INTEGER DEFAULT 0
+  );
+
   CREATE TABLE IF NOT EXISTS prescriptions (
     id TEXT PRIMARY KEY,
     fileName TEXT NOT NULL,
@@ -97,13 +128,15 @@ db.exec(`
   );
 `);
 
+removeLegacyRemovedProducts();
+
 // 2. Seed Initial Products if empty
 const countProducts = db.prepare('SELECT COUNT(*) as count FROM products').get();
 if (countProducts.count === 0) {
   const seedProducts = [
     {
       id: "med-1",
-      name: "Dutaheal 0.5mg Tablets",
+      name: "Zopiclone Tablet 10mg",
       genericName: "Dutasteride 0.5mg",
       category: "Tablets",
       price: 420,
@@ -125,7 +158,7 @@ if (countProducts.count === 0) {
     },
     {
       id: "med-2",
-      name: "AccuRet 20mg Capsules",
+      name: "Pregabalin 150mg",
       genericName: "Isotretinoin 20mg",
       category: "Capsules",
       price: 680,
@@ -147,7 +180,7 @@ if (countProducts.count === 0) {
     },
     {
       id: "med-3",
-      name: "Semalix Semaglutide 3mg Tablets",
+      name: "A RET TRETIGEL 0.1% 20 MG GEL",
       genericName: "Semaglutide 3mg",
       category: "Tablets",
       price: 3450,
@@ -169,7 +202,7 @@ if (countProducts.count === 0) {
     },
     {
       id: "med-4",
-      name: "Eravone Edaravone Injection",
+      name: "Semaglutide Tablets",
       genericName: "Edaravone 30mg / 20ml",
       category: "Injections",
       price: 1850,
@@ -191,7 +224,7 @@ if (countProducts.count === 0) {
     },
     {
       id: "med-5",
-      name: "Aromasin Exemestane 25mg Tablets",
+      name: "Urenone Eplerenone 25 Mg Tablet",
       genericName: "Exemestane 25mg",
       category: "Anti-Cancer",
       price: 2200,
@@ -233,50 +266,6 @@ if (countProducts.count === 0) {
       storage: "Store protected from light and moisture at a temperature not exceeding 30°C.",
       dosage: "Take with a full glass of water. Do not lie down immediately.",
     },
-    {
-      id: "med-7",
-      name: "Fempro Letrozole 2.5mg Tablets",
-      genericName: "Letrozole 2.5mg",
-      category: "Anti-Cancer",
-      price: 890,
-      wholesalePrice: 620,
-      moq: 10,
-      packSize: "Strip of 10 Tablets",
-      manufacturer: "Cipla Ltd",
-      prescriptionRequired: 1,
-      stock: 140,
-      rating: 4.9,
-      reviewsCount: 44,
-      isFeatured: 0,
-      isBestSeller: 0,
-      image: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?w=600&auto=format&fit=crop&q=80",
-      description: "Fempro (Letrozole 2.5mg) is a nonsteroidal aromatase inhibitor used in the treatment of hormonally responsive breast cancer in postmenopausal women.",
-      composition: "Each film-coated tablet contains: Letrozole IP 2.5 mg",
-      storage: "Store below 25°C. Protect from moisture.",
-      dosage: "One 2.5mg tablet once daily.",
-    },
-    {
-      id: "med-8",
-      name: "Hydrobact Hydroquinone 4% Cream",
-      genericName: "Hydroquinone 4.0% w/w",
-      category: "Skin Care",
-      price: 320,
-      wholesalePrice: 190,
-      moq: 10,
-      packSize: "Tube of 20g",
-      manufacturer: "Komedics Pharma",
-      prescriptionRequired: 0,
-      stock: 220,
-      rating: 4.7,
-      reviewsCount: 56,
-      isFeatured: 0,
-      isBestSeller: 1,
-      image: "https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80",
-      description: "Hydrobact skin lightening cream formulated with 4% Hydroquinone for topical gradual depigmentation of hyperpigmented skin conditions such as melasma and freckles.",
-      composition: "Hydroquinone USP 4.0% w/w in an aqueous cream base",
-      storage: "Store below 25°C. Do not freeze.",
-      dosage: "Apply a thin layer to affected hyperpigmented areas twice daily.",
-    }
   ];
 
   const insertProduct = db.prepare(`
@@ -326,8 +315,7 @@ if (countOrders.count === 0) {
     hasPrescription: 1,
     prescriptionFile: 'Dr_Prescription_Sharma.pdf',
     items: JSON.stringify([
-      { id: 'med-1', name: 'Dutaheal 0.5mg Tablets', quantity: 6, price: 420 },
-      { id: 'med-8', name: 'Hydrobact Hydroquinone 4% Cream', quantity: 4, price: 320 }
+      { id: 'med-1', name: 'Zopiclone Tablet 10mg', quantity: 6, price: 420 }
     ]),
     date: '2026-09-29'
   });
@@ -347,7 +335,7 @@ if (countOrders.count === 0) {
     hasPrescription: 0,
     prescriptionFile: null,
     items: JSON.stringify([
-      { id: 'med-2', name: 'AccuRet 20mg Capsules', quantity: 1, price: 480 }
+      { id: 'med-2', name: 'Pregabalin 150mg', quantity: 1, price: 480 }
     ]),
     date: '2026-10-01'
   });
@@ -366,7 +354,7 @@ if (countInquiries.count === 0) {
 
   insertInq.run({
     id: 'inq-101',
-    productName: 'Semalix Semaglutide 3mg Tablets',
+    productName: 'A RET TRETIGEL 0.1% 20 MG GEL',
     buyerName: 'Dr. Vivek Mehra',
     email: 'vivek@delhiclinic.com',
     phone: '+91 9811223344',
@@ -380,7 +368,7 @@ if (countInquiries.count === 0) {
 
   insertInq.run({
     id: 'inq-102',
-    productName: 'Eravone Edaravone Injection',
+    productName: 'Semaglutide Tablets',
     buyerName: 'Metro Hospital Procurement',
     email: 'procure@metrohospitals.in',
     phone: '+91 9922334455',

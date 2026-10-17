@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   X, ShoppingBag, MessageCircle, AlertCircle, CheckCircle2, 
   Building2, ShieldCheck, Thermometer, Info, ChevronRight, Package 
 } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 
-export default function ProductDetailModal() {
+export default function ProductDetailModal({ onGetBestPrice }) {
   const { 
     activeProductModal, 
     setActiveProductModal, 
@@ -15,21 +15,14 @@ export default function ProductDetailModal() {
   } = useCart();
 
   const product = activeProductModal;
-  const [quantity, setQuantity] = useState(product?.moq || 1);
 
   if (!product) return null;
 
-  // Dynamic Tier pricing logic
-  const isWholesaleApplied = quantity >= product.moq;
-  const unitPrice = isWholesaleApplied ? product.wholesalePrice : product.price;
-  const totalPrice = unitPrice * quantity;
-  const savings = (product.price * quantity) - totalPrice;
-
   const handleWhatsAppEnquiry = () => {
     const text = encodeURIComponent(
-      `Hello Sigma Medex,\nI am interested in placing an order for:\n*Product:* ${product.name}\n*Generic Salt:* ${product.genericName}\n*Quantity:* ${quantity} Units\n*MOQ:* ${product.moq}\nPlease share wholesale quote and dispatch time.`
+      `Hello Vital Medex,\nI am interested in:\n*Product:* ${product.name}\n*Generic Salt:* ${product.genericName}\nPlease share the wholesale quote and dispatch time.`
     );
-    window.open(`https://wa.me/918047302413?text=${text}`, '_blank');
+    window.open(`https://wa.me/919307994481?text=${text}`, '_blank');
   };
 
   return (
@@ -82,170 +75,58 @@ export default function ProductDetailModal() {
                 </div>
               </div>
 
-              {/* Manufacturer & Packing info */}
-              <div className="mt-4 p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-1.5 text-slate-700">
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Manufacturer:</span>
-                  <span className="font-bold text-slate-900">{product.manufacturer}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Packaging:</span>
-                  <span className="font-bold text-slate-900">{product.packSize}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Min. Order (MOQ):</span>
-                  <span className="font-bold text-teal-700">{product.moq} Units</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">Stock Status:</span>
-                  <span className="font-bold text-emerald-600">In Stock ({product.stock})</span>
-                </div>
-              </div>
             </div>
 
-            {/* Details & Tier Price Column */}
+            {/* Product Details */}
             <div className="md:col-span-7 space-y-4">
               <div>
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 leading-snug">
                   {product.name}
                 </h2>
-                <p className="text-sm font-semibold text-teal-800 mt-1">
-                  Active Salt: {product.genericName}
-                </p>
-                <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                <div className="mt-3 border-t border-slate-200 pt-3 text-xs leading-5 text-slate-700">
+                  <p><strong>Brand:</strong> {product.brand || product.name}</p>
+                  <p><strong>Composition:</strong> {product.composition || product.genericName}</p>
+                  <p><strong>Strength:</strong> {product.strength || product.genericName}</p>
+                  <p><strong>Manufactured by:</strong> {product.manufacturer}</p>
+                  <p><strong>Form:</strong> {product.dosageForm || product.category}</p>
+                  <p><strong>Packing:</strong> {product.packSize}</p>
+                </div>
+                <p className="mt-3 text-xs leading-relaxed text-slate-500">
                   {product.description}
                 </p>
               </div>
 
-              {/* Dynamic Tier Pricing Table */}
-              <div className="bg-gradient-to-br from-teal-50/70 to-slate-50 border border-teal-200/80 rounded-2xl p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-teal-950 uppercase tracking-wide">
-                    Wholesale Tiered Pricing
-                  </span>
-                  {isWholesaleApplied && (
-                    <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-emerald-600 text-white">
-                      Wholesale Rate Active
-                    </span>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className={`p-2.5 rounded-xl border transition ${
-                    !isWholesaleApplied 
-                      ? 'bg-white border-teal-500 shadow-sm' 
-                      : 'bg-white/60 border-slate-200'
-                  }`}>
-                    <span className="block text-[11px] text-slate-500">Retail / Sample (&lt;{product.moq} units)</span>
-                    <span className="text-base font-black text-slate-900">₹{product.price}</span>
-                    <span className="text-[10px] text-slate-400 block">/ unit</span>
-                  </div>
-
-                  <div className={`p-2.5 rounded-xl border transition ${
-                    isWholesaleApplied 
-                      ? 'bg-emerald-50 border-emerald-500 shadow-sm' 
-                      : 'bg-white/60 border-slate-200'
-                  }`}>
-                    <span className="block text-[11px] text-emerald-800 font-bold">Wholesale Tier (≥{product.moq} units)</span>
-                    <span className="text-base font-black text-emerald-700">₹{product.wholesalePrice}</span>
-                    <span className="text-[10px] text-emerald-600 block">Save ₹{product.price - product.wholesalePrice}/unit</span>
-                  </div>
-                </div>
-
-                {/* Quantity Controller & Price Preview */}
-                <div className="mt-4 pt-3 border-t border-teal-200/50 flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xs font-semibold text-slate-700">Select Qty:</span>
-                    <div className="flex items-center border border-slate-300 rounded-xl bg-white overflow-hidden shadow-sm">
-                      <button
-                        onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="px-3 py-1.5 text-sm font-bold text-slate-600 hover:bg-slate-100"
-                      >
-                        -
-                      </button>
-                      <input
-                        type="number"
-                        min="1"
-                        value={quantity}
-                        onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                        className="w-12 text-center text-xs font-bold text-slate-900 border-none focus:outline-none"
-                      />
-                      <button
-                        onClick={() => setQuantity(quantity + 1)}
-                        className="px-3 py-1.5 text-sm font-bold text-slate-600 hover:bg-slate-100"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="text-right">
-                    <span className="text-[11px] text-slate-500 block">Calculated Total</span>
-                    <span className="text-lg font-black text-slate-900">₹{totalPrice}</span>
-                    {savings > 0 && (
-                      <span className="text-[10px] font-bold text-emerald-600 block">
-                        Saved ₹{savings}!
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-
               {/* Action Buttons */}
-              <div className="space-y-2 pt-2">
+              <div className="grid grid-cols-2 gap-2 pt-2">
                 <button
                   onClick={() => {
-                    addToCart(product, quantity);
                     setActiveProductModal(null);
+                    if (onGetBestPrice) {
+                      onGetBestPrice(product);
+                    }
                   }}
-                  className="w-full py-3 bg-teal-600 hover:bg-teal-700 active:scale-95 text-white font-bold text-sm rounded-xl shadow-md shadow-teal-600/20 flex items-center justify-center gap-2 transition"
+                  className="min-w-0 rounded-xl bg-teal-600 px-2 py-3 text-xs font-bold text-white shadow-md shadow-teal-600/20 transition hover:bg-teal-700 active:scale-95 sm:text-sm"
                 >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Add {quantity} {quantity > 1 ? 'Units' : 'Unit'} to Cart • ₹{totalPrice}</span>
+                  <span className="inline-flex items-center justify-center gap-1.5">
+                    <ShoppingBag className="h-4 w-4 shrink-0" />
+                    Get Best Price
+                  </span>
                 </button>
 
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => {
-                      setB2bTargetProduct(product);
-                      setActiveProductModal(null);
-                      setIsB2BModalOpen(true);
-                    }}
-                    className="py-2.5 px-3 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition"
-                  >
-                    <span>Request Formal Quote</span>
-                  </button>
-
-                  <button
-                    onClick={handleWhatsAppEnquiry}
-                    className="py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition"
-                  >
+                <button
+                  onClick={handleWhatsAppEnquiry}
+                  className="min-w-0 rounded-xl border border-emerald-300 bg-emerald-50 px-2 py-3 text-xs font-bold text-emerald-800 transition hover:bg-emerald-100"
+                >
+                  <span className="inline-flex items-center justify-center gap-1.5">
                     <MessageCircle className="w-4 h-4 text-emerald-600" />
-                    <span>WhatsApp Inquiry</span>
-                  </button>
-                </div>
+                    WhatsApp Inquiry
+                  </span>
+                </button>
               </div>
 
             </div>
           </div>
 
-          {/* Clinical & Formulation Details */}
-          <div className="border-t border-slate-200 pt-5 space-y-3">
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-              <Info className="w-4 h-4 text-teal-600" />
-              Formulation & Prescribing Information
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-              <div className="p-3 bg-slate-50 rounded-xl">
-                <span className="font-bold text-slate-800 block mb-0.5">Composition:</span>
-                <p className="text-slate-600">{product.composition}</p>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-xl">
-                <span className="font-bold text-slate-800 block mb-0.5">Storage Instruction:</span>
-                <p className="text-slate-600">{product.storage}</p>
-              </div>
-            </div>
-          </div>
 
         </div>
       </div>

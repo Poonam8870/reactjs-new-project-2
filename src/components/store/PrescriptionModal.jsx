@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { X, UploadCloud, FileText, CheckCircle2, ShieldCheck, AlertCircle } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
 
@@ -26,7 +26,7 @@ export default function PrescriptionModal() {
       patientName: 'Rameshwar Kulkarni',
       doctorName: 'Dr. V. P. Mehta, MD (Medicine)',
       fileName: 'Sample_Certified_Doctor_Prescription.pdf',
-      notes: 'Prescribed Semaglutide 3mg & Dutaheal 0.5mg for 30 days.'
+      notes: 'Prescribed Semaglutide 3mg & Zopiclone 10mg for 30 days.'
     });
     setFileAttached(true);
   };
@@ -107,7 +107,7 @@ export default function PrescriptionModal() {
                 <UploadCloud className="w-10 h-10 text-slate-400 mx-auto mb-2" />
                 {formData.fileName ? (
                   <div className="text-xs">
-                    <span className="font-bold text-teal-700 block">✓ Selected File:</span>
+                    <span className="font-bold text-teal-700 block">âœ“ Selected File:</span>
                     <span className="text-slate-700">{formData.fileName}</span>
                   </div>
                 ) : (

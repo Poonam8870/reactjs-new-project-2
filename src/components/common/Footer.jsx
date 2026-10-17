@@ -1,126 +1,107 @@
 import React from 'react';
-import { ShieldCheck, Phone, Mail, MapPin, CheckCircle2, Clock } from 'lucide-react';
+import { Mail, Phone } from 'lucide-react';
+import { SiInstagram, SiTelegram, SiWhatsapp } from 'react-icons/si';
 import { CATEGORIES } from '../../data/initialProducts';
 import { useProducts } from '../../context/ProductContext';
 
-export default function Footer({ onNavigate }) {
+export default function Footer({ onOpenEnquiry }) {
   const { setSelectedCategory } = useProducts();
 
   return (
-    <footer className="bg-slate-950 text-slate-400 border-t border-slate-800 text-xs pt-12 pb-8">
-      <div className="max-w-7xl mx-auto px-4">
-        
-        {/* Top Trust Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 pb-10 border-b border-slate-800/80">
-          <div className="flex items-start space-x-3">
-            <ShieldCheck className="w-6 h-6 text-teal-400 flex-shrink-0" />
-            <div>
-              <h4 className="text-white font-bold text-sm">GST & Drug Verified</h4>
-              <p className="mt-0.5 text-slate-500">GST: 27AEPFS7579K1ZW with valid wholesale drug licenses.</p>
+    <footer className="mt-auto border-t border-slate-800 bg-slate-950 text-xs text-slate-400">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid grid-cols-1 gap-8 py-9 sm:grid-cols-2 lg:grid-cols-4 lg:gap-10 lg:py-11">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <img
+                src="/Vital%20Medex%20Healthcare%20Logo.png"
+                alt="Vital Medex Healthcare logo"
+                className="h-11 w-11 rounded-xl object-contain bg-white ring-1 ring-slate-700"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'inline';
+                }}
+              />
+              <div className="flex items-center gap-1.5" style={{ display: 'none' }}>
+                <span className="text-xl font-black text-white">Vital</span>
+                <span className="text-xl font-black text-teal-400">Medex</span>
+              </div>
             </div>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <CheckCircle2 className="w-6 h-6 text-emerald-400 flex-shrink-0" />
-            <div>
-              <h4 className="text-white font-bold text-sm">WHO-GMP Standard</h4>
-              <p className="mt-0.5 text-slate-500">All medicines sourced from audited pharmaceutical manufacturers.</p>
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <Clock className="w-6 h-6 text-sky-400 flex-shrink-0" />
-            <div>
-              <h4 className="text-white font-bold text-sm">100% Response Rate</h4>
-              <p className="mt-0.5 text-slate-500">Fast quote dispatch within 2-4 hours for wholesale buyers.</p>
-            </div>
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <Phone className="w-6 h-6 text-amber-400 flex-shrink-0" />
-            <div>
-              <h4 className="text-white font-bold text-sm">Direct Desk</h4>
-              <p className="mt-0.5 text-slate-500">Call 08047302413 / WhatsApp for instant inquiry fulfillment.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Links Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 py-10 border-b border-slate-800/80">
-          
-          {/* Company Bio */}
-          <div className="md:col-span-4 space-y-3">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xl font-black text-white">Sigma</span>
-              <span className="text-xl font-black text-teal-400">Medex</span>
-            </div>
-            <p className="text-slate-400 leading-relaxed text-xs">
-              Established in 2016 in Nagpur, Maharashtra, Sigma Medex is a trusted pharmaceutical wholesaler, trader, distributor, and exporter supplying high-efficacy prescription tablets, injections, oncology medications, and bulk pharmaceuticals worldwide.
+            <p className="max-w-xs text-xs leading-6 text-slate-400">
+              Vital Medex is a specialized pharmaceutical wholesaler, distributor, and international exporter supplying premium tablets, capsules, injections, oncology, and specialty medicines.
             </p>
-            <div className="text-[11px] text-slate-500 pt-2 space-y-1">
-              <p className="flex items-center gap-2">
-                <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                Nagpur, Maharashtra, India - 440010
-              </p>
-              <p className="flex items-center gap-2">
-                <Mail className="w-3.5 h-3.5 text-slate-400" />
-                sales@sigmamedex.com
-              </p>
+            <div className="flex items-center gap-2 pt-1">
+              <a href="https://www.instagram.com/vitalmedex?obrf=a2R4eGp3djV0Z2pw&utm_source=qr" target="_blank" rel="noreferrer" aria-label="Visit Vital Medex on Instagram" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-300 transition hover:bg-pink-950 hover:text-pink-300">
+                <SiInstagram className="h-4 w-4" />
+              </a>
+              <a href="https://t.me/vitalmedex" target="_blank" rel="noreferrer" aria-label="Visit Vital Medex on Telegram" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-300 transition hover:bg-sky-950 hover:text-sky-300">
+                <SiTelegram className="h-4 w-4" />
+              </a>
+              <a href="https://wa.me/919307994481" target="_blank" rel="noreferrer" aria-label="Chat with Vital Medex on WhatsApp" className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-800 text-slate-300 transition hover:bg-emerald-950 hover:text-emerald-300">
+                <SiWhatsapp className="h-4 w-4" />
+              </a>
             </div>
           </div>
 
-          {/* Product Categories */}
-          <div className="md:col-span-4 space-y-2">
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-              Medicine Categories
+          <div className="space-y-4">
+            <h4 className="font-bold text-white">Store Links</h4>
+            <div className="flex flex-col items-start gap-3 text-slate-400">
+              <a href="#product-catalog" className="transition hover:text-teal-300">Browse Products</a>
+              <a href="#about-store" className="transition hover:text-teal-300">About Vital Medex</a>
+              <button onClick={() => onOpenEnquiry(null)} className="transition hover:text-teal-300">
+                Send an Enquiry
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <h4 className="font-bold text-white">
+              Useful Categories
             </h4>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              {CATEGORIES.slice(1).map(cat => (
+            <div className="flex flex-col items-start gap-3 text-slate-400">
+              {CATEGORIES.slice(1, 6).map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => {
                     setSelectedCategory(cat.id);
-                    if (onNavigate) onNavigate('store');
-                    window.scrollTo({ top: 400, behavior: 'smooth' });
+                    document.getElementById('product-catalog')?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="text-left text-slate-400 hover:text-teal-400 transition"
+                  className="text-left transition hover:text-teal-300"
                 >
-                  • {cat.name}
+                  {cat.name}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Business & Legal */}
-          <div className="md:col-span-4 space-y-2 text-xs">
-            <h4 className="text-white font-bold text-xs uppercase tracking-wider mb-3">
-              Compliance & Wholesale Trade
+          <div className="space-y-4">
+            <h4 className="font-bold text-white">
+              Connect With Us
             </h4>
-            <ul className="space-y-1.5 text-slate-400">
-              <li>• IndiaMART Verified Premium Trader</li>
-              <li>• Payment Protected Buyer Safe Escrow</li>
-              <li>• Wholesale Dropshipping Services</li>
-              <li>• Certificate of Analysis (COA) Provided</li>
-              <li>• B2B GST Tax Invoice on every shipment</li>
-            </ul>
-
-            <div className="mt-4 p-3 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-teal-300">
-              ⚡ Minimum Order Quantity (MOQ) rates apply automatically when ordering wholesale quantities.
+            <div className="space-y-3 text-slate-400">
+              <a href="tel:+919307994481" className="flex items-center gap-2 transition hover:text-teal-300">
+                <Phone className="h-3.5 w-3.5 shrink-0" />
+                +91 93079 94481
+              </a>
+              <a href="tel:+919307979849" className="flex items-center gap-2 transition hover:text-teal-300">
+                <Phone className="h-3.5 w-3.5 shrink-0" />
+                +91 93079 79849
+              </a>
+              <a href="mailto:sales@vitalmedex.com" className="flex items-center gap-2 transition hover:text-teal-300">
+                <Mail className="h-3.5 w-3.5 shrink-0" />
+                sales@vitalmedex.com
+              </a>
             </div>
           </div>
-
         </div>
 
-        {/* Bottom Copyright */}
-        <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-slate-500 text-[11px]">
-          <p>© {new Date().getFullYear()} Sigma Medex Wholesale & Retail Commerce. All rights reserved.</p>
-          <div className="flex items-center space-x-4">
-            <span>Terms of Wholesale Supply</span>
-            <span>Privacy Policy</span>
-            <span>Schedule H Compliance</span>
-          </div>
+      </div>
+      <div className="border-t border-slate-800 bg-slate-900/70">
+        <div className="mx-auto flex max-w-6xl justify-center px-4 py-4 sm:px-6">
+          <p className="text-center text-[11px] text-slate-500">
+            © {new Date().getFullYear()} Vital Medex. All rights reserved.
+          </p>
         </div>
-
       </div>
     </footer>
   );
